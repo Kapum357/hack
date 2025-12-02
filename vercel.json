@@ -1,12 +1,6 @@
 {
-  "framework": null,
+  "framework": "flask",
   "buildCommand": null,
   "outputDirectory": ".",
-  "installCommand": "npm install",
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "http://localhost:5000/api/:path*"
-    }
-  ]
+  "installCommand": "pip install -r requirements.txt"
 }
