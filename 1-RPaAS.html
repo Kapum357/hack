@@ -9,6 +9,8 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#002468", "background-light": "#f5f6f8", "background-dark": "#0f1623"}, fontFamily: {display: "Sora"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}}}};</script>
 <style>
     .material-symbols-outlined {
@@ -89,8 +91,8 @@
 <div class="flex flex-1 flex-col">
 <div class="@container flex h-full flex-1 flex-col">
 <div class="flex flex-1 flex-col p-6 @[480px]:p-8">
-<div class="bg-cover bg-center flex min-h-[320px] flex-1 flex-col justify-between rounded-lg p-6 @[480px]:p-8" data-alt="A satellite map of Soacha, Colombia with a red-orange-yellow heat map overlay indicating areas of high climate risk." data-location="Soacha, Colombia" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDv5-dxl0XpOb5VFWy9vUSRrouhynjie1ynIhCvL_0p5Pz9lnotOXELZOEPlFqVJH9ZhF_m-g0vrnSVNKiQDeCQEZImGoNq--QeKMSOzMuUy3t-wJmwBxyyBcwMZ2B6G0yXxiVYLgIpqHFlt_gE_a3e8MSFNTmPI6RigxGMaXHvCWxLZMlhW8jpI7jf3LJ1ThgZEfw_uJQIE9tDh4ZEra-U7uS5cfJU4mE-YsZCsOBMT-gqAPpe-3l3q_yE4PXGRaDLnYww8SANZXU");'>
-<label class="flex w-full max-w-md flex-col min-w-40 h-12 self-start">
+<div id="map" class="flex min-h-[320px] flex-1 flex-col justify-between rounded-lg relative">
+<label class="flex w-full max-w-md flex-col min-w-40 h-12 self-start z-10 relative">
 <div class="flex w-full flex-1 items-stretch rounded-lg h-full shadow-lg">
 <div class="text-[#92c9a8] flex border-none bg-[#193324] items-center justify-center pl-4 rounded-l-lg border-r-0">
 <span class="material-symbols-outlined">search</span>
@@ -98,9 +100,9 @@
 <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-[#193324] focus:border-none h-full placeholder:text-[#92c9a8] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search neighborhoods or landmarks" value=""/>
 </div>
 </label>
-<div class="flex items-end justify-between">
+<div class="flex items-end justify-between absolute bottom-6 left-6 right-6 @[480px]:bottom-8 @[480px]:left-8 @[480px]:right-8">
 <!-- Information Card -->
-<div class="flex w-80 flex-col gap-4 rounded-lg bg-[#112218]/80 p-4 backdrop-blur-sm ring-1 ring-white/10">
+<div class="flex w-80 flex-col gap-4 rounded-lg bg-[#112218]/80 p-4 backdrop-blur-sm ring-1 ring-white/10 z-10">
 <div class="flex flex-col">
 <p class="text-sm font-medium text-white/70">Barrio Cazucá</p>
 <h3 class="text-xl font-bold text-white">High Risk (9/10)</h3>
@@ -118,7 +120,7 @@
 <p class="text-xs text-primary">Potential for flash flooding. Community alert recommended.</p>
 </div>
 <!-- Map Controls -->
-<div class="flex flex-col items-end gap-3">
+<div class="flex flex-col items-end gap-3 z-10">
 <div class="flex flex-col gap-0.5">
 <button class="flex size-10 items-center justify-center rounded-t-lg bg-[#193324] shadow-[0_2px_4px_rgba(0,0,0,0.1)] text-white hover:bg-[#234832]">
 <span class="material-symbols-outlined">add</span>
@@ -205,4 +207,109 @@
 </main>
 </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = L.map('map').setView([4.58, -74.21], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Mock risk areas (polygons with risk levels)
+    const riskAreas = [
+        {
+            name: 'Barrio Cazucá',
+            coords: [[4.59, -74.22], [4.59, -74.20], [4.57, -74.20], [4.57, -74.22]],
+            risk: 9,
+            households: 500
+        },
+        {
+            name: 'El Danubio',
+            coords: [[4.58, -74.215], [4.58, -74.205], [4.56, -74.205], [4.56, -74.215]],
+            risk: 7,
+            households: 300
+        },
+        // Add more areas as needed
+    ];
+
+    // Function to get color based on risk
+    function getColor(risk) {
+        return risk > 8 ? '#dc2626' : risk > 5 ? '#ea580c' : '#eab308';
+    }
+
+    // Add risk polygons
+    riskAreas.forEach(area => {
+        L.polygon(area.coords, {color: getColor(area.risk), fillOpacity: 0.5}).addTo(map)
+            .bindPopup(`<b>${area.name}</b><br>Risk: ${area.risk}/10<br>Households: ~${area.households}`);
+    });
+
+    // Mock weather data (in real app, fetch from API)
+    const weatherData = {
+        precipitation: 50, // mm/hr
+        temperature: 32, // C
+        humidity: 80 // %
+    };
+
+    // Simple risk prediction logic
+    function calculateRisk(precip, temp, humid) {
+        let risk = 0;
+        if (precip > 40) risk += 4;
+        else if (precip > 20) risk += 2;
+        if (temp > 30) risk += 3;
+        if (humid > 70) risk += 2;
+        return Math.min(risk, 10);
+    }
+
+    const currentRisk = calculateRisk(weatherData.precipitation, weatherData.temperature, weatherData.humidity);
+
+    // Update info card
+    const infoCard = document.querySelector('.flex.w-80');
+    if (infoCard) {
+        const riskText = infoCard.querySelector('h3');
+        const precipTexts = infoCard.querySelectorAll('p.font-semibold');
+        const precipText = precipTexts[0];
+        const householdsText = precipTexts[1];
+        const alertText = infoCard.querySelector('p.text-xs');
+
+        riskText.textContent = `High Risk (${currentRisk}/10)`;
+        precipText.textContent = `${weatherData.precipitation}mm/hr`;
+        householdsText.textContent = '~500'; // Mock
+        alertText.textContent = currentRisk > 8 ? 'Potential for flash flooding. Community alert recommended.' : 'Moderate risk. Monitor conditions.';
+    }
+
+    // Alert system
+    if (currentRisk > 8) {
+        // Show alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'fixed top-4 right-4 bg-red-600 text-white p-4 rounded-lg shadow-lg z-50';
+        alertDiv.innerHTML = '<strong>ALERT:</strong> High risk of flooding detected. Evacuation recommended for vulnerable areas.';
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 10000);
+    }
+
+    // Map controls
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(btn => {
+        const icon = btn.querySelector('.material-symbols-outlined');
+        if (icon) {
+            if (icon.textContent.includes('add')) {
+                btn.addEventListener('click', () => map.zoomIn());
+            } else if (icon.textContent.includes('remove')) {
+                btn.addEventListener('click', () => map.zoomOut());
+            } else if (icon.textContent.includes('my_location')) {
+                btn.addEventListener('click', () => map.locate({setView: true, maxZoom: 16}));
+            }
+        }
+    });
+
+    // Send Alert button
+    const sendAlertBtn = Array.from(document.querySelectorAll('button span')).find(span => span.textContent.includes('Send Alert'));
+    if (sendAlertBtn) {
+        sendAlertBtn.parentElement.addEventListener('click', () => {
+            alert('Alert sent to community leaders and emergency services.');
+        });
+    }
+});
+</script>
 </body></html>

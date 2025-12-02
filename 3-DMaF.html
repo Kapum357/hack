@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#002468", "background-light": "#f5f6f8", "background-dark": "#0f1623"}, fontFamily: {display: "Sora"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}}}};</script>
 <style>
         body {
@@ -147,8 +149,8 @@
 <!-- Map -->
 <div class="@container flex flex-col h-full flex-1">
 <div class="flex flex-1 flex-col p-4">
-<div class="bg-cover bg-center flex min-h-[320px] flex-1 flex-col justify-between rounded-lg" data-alt="Interactive map of Soacha, Colombia with data overlays" data-location="Soacha, Colombia" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDv5-dxl0XpOb5VFWy9vUSRrouhynjie1ynIhCvL_0p5Pz9lnotOXELZOEPlFqVJH9ZhF_m-g0vrnSVNKiQDeCQEZImGoNq--QeKMSOzMuUy3t-wJmwBxyyBcwMZ2B6G0yXxiVYLgIpqHFlt_gE_a3e8MSFNTmPI6RigxGMaXHvCWxLZMlhW8jpI7jf3LJ1ThgZEfw_uJQIE9tDh4ZEra-U7uS5cfJU4mE-YsZCsOBMT-gqAPpe-3l3q_yE4PXGRaDLnYww8SANZXU");'>
-<div class="p-4">
+<div id="map" class="flex min-h-[320px] flex-1 flex-col justify-between rounded-lg relative">
+<div class="p-4 z-10">
 <label class="flex flex-col min-w-40 h-12 max-w-sm">
 <div class="flex w-full flex-1 items-stretch rounded-lg h-full shadow-lg">
 <div class="text-slate-500 dark:text-[#92c9a8] flex border-none bg-white dark:bg-[#193324] items-center justify-center pl-4 rounded-l-lg border-r-0">
@@ -158,16 +160,16 @@
 </div>
 </label>
 </div>
-<div class="flex flex-col items-end gap-3 p-4">
+<div class="flex flex-col items-end gap-3 p-4 z-10">
 <div class="flex flex-col gap-0.5">
-<button class="flex size-10 items-center justify-center rounded-t-lg bg-white dark:bg-[#193324] shadow-lg text-slate-800 dark:text-white">
+<button id="zoom-in" class="flex size-10 items-center justify-center rounded-t-lg bg-white dark:bg-[#193324] shadow-lg text-slate-800 dark:text-white">
 <span class="material-symbols-outlined">add</span>
 </button>
-<button class="flex size-10 items-center justify-center rounded-b-lg bg-white dark:bg-[#193324] shadow-lg text-slate-800 dark:text-white">
+<button id="zoom-out" class="flex size-10 items-center justify-center rounded-b-lg bg-white dark:bg-[#193324] shadow-lg text-slate-800 dark:text-white">
 <span class="material-symbols-outlined">remove</span>
 </button>
 </div>
-<button class="flex size-10 items-center justify-center rounded-lg bg-white dark:bg-[#193324] shadow-lg text-slate-800 dark:text-white">
+<button id="my-location" class="flex size-10 items-center justify-center rounded-lg bg-white dark:bg-[#193324] shadow-lg text-slate-800 dark:text-white">
 <span class="material-symbols-outlined">my_location</span>
 </button>
 </div>
@@ -257,4 +259,173 @@
 </main>
 </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = L.map('map').setView([4.58, -74.21], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Mock data layers
+    const layers = {
+        temperature: L.layerGroup(),
+        floodRisk: L.layerGroup(),
+        populationDensity: L.layerGroup(),
+        zones: {
+            zone1: L.layerGroup(),
+            zone2: L.layerGroup(),
+            zone3: L.layerGroup(),
+            comuna4: L.layerGroup()
+        }
+    };
+
+    // Add mock data points
+    // Temperature markers
+    const tempData = [
+        {lat: 4.59, lng: -74.22, temp: 32},
+        {lat: 4.57, lng: -74.20, temp: 31},
+        {lat: 4.58, lng: -74.21, temp: 33}
+    ];
+    tempData.forEach(point => {
+        L.circleMarker([point.lat, point.lng], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.5,
+            radius: 8
+        }).addTo(layers.temperature).bindPopup(`Temperature: ${point.temp}°C`);
+    });
+
+    // Flood risk polygons
+    const floodAreas = [
+        [[4.59, -74.22], [4.59, -74.20], [4.57, -74.20], [4.57, -74.22]]
+    ];
+    floodAreas.forEach(area => {
+        L.polygon(area, {color: 'blue', fillOpacity: 0.3}).addTo(layers.floodRisk);
+    });
+
+    // Population density (circles)
+    L.circle([4.58, -74.21], {color: 'green', fillOpacity: 0.3, radius: 500}).addTo(layers.populationDensity);
+
+    // Zones
+    const zoneCoords = {
+        zone1: [[4.59, -74.22], [4.59, -74.20], [4.57, -74.20], [4.57, -74.22]],
+        zone2: [[4.58, -74.215], [4.58, -74.205], [4.56, -74.205], [4.56, -74.215]],
+        zone3: [[4.55, -74.22], [4.55, -74.20], [4.53, -74.20], [4.53, -74.22]],
+        comuna4: [[4.60, -74.19], [4.60, -74.17], [4.58, -74.17], [4.58, -74.19]]
+    };
+    Object.keys(zoneCoords).forEach(zone => {
+        L.polygon(zoneCoords[zone], {color: 'orange', fillOpacity: 0.2}).addTo(layers.zones[zone]);
+    });
+
+    // Layer control
+    const overlays = {
+        'Temperature': layers.temperature,
+        'Flood Risk': layers.floodRisk,
+        'Population Density': layers.populationDensity,
+        'Zone 1': layers.zones.zone1,
+        'Zone 2': layers.zones.zone2,
+        'Zone 3': layers.zones.zone3,
+        'Comuna 4': layers.zones.comuna4
+    };
+    L.control.layers(null, overlays).addTo(map);
+
+    // Initially show some layers
+    map.addLayer(layers.temperature);
+    map.addLayer(layers.floodRisk);
+
+    // Filter functionality
+    const timeSelect = document.querySelector('select');
+    const zoneCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+    const applyFiltersBtn = document.querySelector('button span');
+
+    function applyFilters() {
+        // Time filter (mock)
+        const timePeriod = timeSelect.value;
+        console.log('Applying time filter:', timePeriod);
+
+        // Zone filters
+        const selectedZones = Array.from(zoneCheckboxes).slice(0, 4).filter(cb => cb.checked).map(cb => {
+            const text = cb.nextElementSibling.textContent.toLowerCase().replace(' ', '');
+            if (text === 'zone1') return 'zone1';
+            if (text === 'zone2') return 'zone2';
+            if (text === 'zone3') return 'zone3';
+            if (text === 'comuna4') return 'comuna4';
+            return null;
+        }).filter(Boolean);
+
+        Object.keys(layers.zones).forEach(zone => {
+            if (selectedZones.includes(zone)) {
+                map.addLayer(layers.zones[zone]);
+            } else {
+                map.removeLayer(layers.zones[zone]);
+            }
+        });
+
+        // Data layer filters
+        const selectedLayers = Array.from(zoneCheckboxes).slice(4).filter(cb => cb.checked).map(cb => {
+            const text = cb.nextElementSibling.textContent.toLowerCase().replace(' ', '');
+            if (text === 'temperature') return 'temperature';
+            if (text === 'floodrisk') return 'floodRisk';
+            if (text === 'populationdensity') return 'populationDensity';
+            return null;
+        }).filter(Boolean);
+
+        ['temperature', 'floodRisk', 'populationDensity'].forEach(layer => {
+            if (selectedLayers.includes(layer)) {
+                map.addLayer(layers[layer]);
+            } else {
+                map.removeLayer(layers[layer]);
+            }
+        });
+    }
+
+    // Event listeners
+    if (applyFiltersBtn && applyFiltersBtn.textContent.includes('Apply Filters')) {
+        applyFiltersBtn.parentElement.addEventListener('click', applyFilters);
+    }
+
+    // Map controls
+    document.getElementById('zoom-in').addEventListener('click', () => map.zoomIn());
+    document.getElementById('zoom-out').addEventListener('click', () => map.zoomOut());
+    document.getElementById('my-location').addEventListener('click', () => {
+        map.locate({setView: true, maxZoom: 16});
+    });
+
+    // Data sources management
+    const dataSources = document.querySelectorAll('.p-3.rounded-lg');
+    dataSources.forEach(source => {
+        const buttons = source.querySelectorAll('button');
+        const refreshBtn = buttons[0];
+        const visibilityBtn = buttons[2];
+
+        refreshBtn.addEventListener('click', () => {
+            // Simulate refresh
+            const statusDot = source.querySelector('.w-2.h-2');
+            statusDot.className = 'w-2 h-2 rounded-full bg-green-500';
+            const timeText = source.querySelector('p.text-xs');
+            timeText.textContent = 'Updated just now';
+        });
+
+        visibilityBtn.addEventListener('click', () => {
+            // Toggle visibility (mock)
+            const icon = visibilityBtn.querySelector('.material-symbols-outlined');
+            if (icon.textContent === 'visibility') {
+                icon.textContent = 'visibility_off';
+            } else {
+                icon.textContent = 'visibility';
+            }
+        });
+    });
+
+    // Add new source button
+    const addSourceBtn = document.querySelector('button span');
+    if (addSourceBtn && addSourceBtn.textContent.includes('Add New Source')) {
+        addSourceBtn.parentElement.addEventListener('click', () => {
+            alert('Add new data source functionality would open a modal here.');
+        });
+    }
+});
+</script>
 </body></html>

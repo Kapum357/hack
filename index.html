@@ -1,111 +1,277 @@
 <!DOCTYPE html>
-<html class="dark" lang="es">
-<head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Community Reporting Platform</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-  <script src="tailwind-config.js"></script>
-  <link rel="stylesheet" href="styles.css"/>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display">
-  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-    <div class="layout-container flex h-full grow flex-col">
-      <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 px-6 sm:px-10 lg:px-20 py-3 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-10">
-        <div class="flex items-center gap-4 text-black dark:text-white">
-          <div class="size-6 text-primary">
-            <svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"></path>
-            </svg>
-          </div>
-          <h2 class="text-black dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Resilience Soacha</h2>
-        </div>
-        <div class="flex flex-1 justify-end items-center gap-4 md:gap-8">
-          <nav class="hidden md:flex items-center gap-6">
-            <a class="text-black/80 dark:text-white/80 hover:text-black dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
-            <a class="text-black dark:text-white text-sm font-bold leading-normal" href="#">Submit Report</a>
-          </nav>
-          <div class="flex items-center gap-2">
-            <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-black/5 dark:bg-white/5 text-black/60 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
-              <span class="material-symbols-outlined text-xl">notifications</span>
-            </button>
-            <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-black/5 dark:bg-white/5 text-black/60 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
-              <span class="material-symbols-outlined text-xl">help</span>
-            </button>
-          </div>
-          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCX_uJ4k6-OvBwhBWj4Z3Nn14ygA_Pqw_xWbv__AQ5YN5g3IghggR-SSjngrWgqaj6CNhJ6LFVF5HmH3Fs1tkggpgSnLc6k6fXP1C6q7aH1W_t2I_yEgjOMIeR-3Zetji0-u15Lf2xtQJ6x5HwMteyrHXOEx_H7bk0Hbl-TOg3kACTV_h4RN-ch5rsj51l1wBuHLVOA6CTPiVPGO9z3K2NjIKLOg2s8OHRLBUJ6X3wJhKmD9UfBu1tulsWJgdRyRkWLOKFhmN0sKFM");'></div>
-        </div>
-      </header>
-      <main class="flex-1 w-full max-w-screen-2xl mx-auto p-4 md:p-6 lg:p-8">
-        <div class="flex flex-col gap-6">
-          <div class="flex flex-wrap justify-between items-start gap-3">
-            <div class="flex min-w-72 flex-col gap-2">
-              <h1 class="text-black dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Enviar un Nuevo Reporte Comunitario</h1>
-              <p class="text-black/60 dark:text-white/60 text-base font-normal leading-normal">Haga clic en el mapa para establecer la ubicación o complete los detalles a continuación.</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div id="map" class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl object-cover h-full min-h-[400px] lg:min-h-[700px] sticky top-24" data-alt="Interactive map showing the Soacha area with streets and buildings, ready for a pin drop." data-location="Soacha, Colombia" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDv5-dxl0XpOb5VFWy9vUSRrouhynjie1ynIhCvL_0p5Pz9lnotOXELZOEPlFqVJH9ZhF_m-g0vrnSVNKiQDeCQEZImGoNq--QeKMSOzMuUy3t-wJmwBxyyBcwMZ2B6G0yXxiVYLgIpqHFlt_gE_a3e8MSFNTmPI6RigxGMaXHvCWxLZMlhW8jpI7jf3LJ1ThgZEfw_uJQIE9tDh4ZEra-U7uS5cfJU4mE-YsZCsOBMT-gqAPpe-3l3q_yE4PXGRaDLnYww8SANZXU");'></div>
-            <div class="flex flex-col gap-6">
-              <div class="bg-background-light dark:bg-black/20 border border-black/10 dark:border-white/10 p-6 rounded-xl">
-                <h2 class="text-black dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] mb-6">Detalles del Reporte</h2>
-                <form id="reportForm" class="flex flex-col gap-6">
-                  <div class="flex flex-col">
-                    <label class="text-black dark:text-white text-sm font-medium leading-normal pb-2" for="event-type">Tipo de Evento/Incidente</label>
-                    <select class="form-select w-full min-w-0 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-black/20 dark:border-white/20 bg-background-light dark:bg-background-dark/50 focus:border-primary/50 h-12 placeholder:text-black/40 dark:placeholder:text-white/40 px-3 text-base font-normal leading-normal" id="event-type" required>
-                      <option value="">Seleccione un tipo de evento</option>
-                      <option>Inundación</option>
-                      <option>Deslizamiento de tierra</option>
-                      <option>Daño a la infraestructura</option>
-                      <option>Necesidad de la comunidad</option>
-                    </select>
-                  </div>
-                  <div class="flex flex-col">
-                    <label class="text-black dark:text-white text-sm font-medium leading-normal pb-2" for="event-date">Fecha y Hora</label>
-                    <input class="form-input w-full min-w-0 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-black/20 dark:border-white/20 bg-background-light dark:bg-background-dark/50 focus:border-primary/50 h-12 placeholder:text-black/40 dark:placeholder:text-white/40 px-3 text-base font-normal leading-normal" id="event-date" type="datetime-local" required/>
-                  </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="flex flex-col">
-                      <label class="text-black dark:text-white text-sm font-medium leading-normal pb-2" for="latitude">Latitud</label>
-                      <input class="form-input w-full min-w-0 resize-none overflow-hidden rounded-lg text-black/70 dark:text-white/70 focus:outline-0 border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 h-12 px-3 text-base font-normal leading-normal cursor-not-allowed" id="latitude" placeholder="4.5828" readonly type="text"/>
-                    </div>
-                    <div class="flex flex-col">
-                      <label class="text-black dark:text-white text-sm font-medium leading-normal pb-2" for="longitude">Longitud</label>
-                      <input class="form-input w-full min-w-0 resize-none overflow-hidden rounded-lg text-black/70 dark:text-white/70 focus:outline-0 border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 h-12 px-3 text-base font-normal leading-normal cursor-not-allowed" id="longitude" placeholder="-74.2120" readonly type="text"/>
-                    </div>
-                  </div>
-                  <div class="flex flex-col">
-                    <label class="text-black dark:text-white text-sm font-medium leading-normal pb-2">Cargar Foto/Video</label>
-                    <div class="flex items-center justify-center w-full">
-                      <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-black/20 dark:border-white/20 border-dashed rounded-lg cursor-pointer bg-background-light dark:bg-background-dark/50 hover:bg-black/5 dark:hover:bg-white/5 transition-colors" for="dropzone-file">
-                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                          <span class="material-symbols-outlined text-4xl text-black/50 dark:text-white/50 mb-2">cloud_upload</span>
-                          <p class="mb-2 text-sm text-black/60 dark:text-white/60"><span class="font-semibold">Haga clic para cargar</span> o arrastre y suelte</p>
-                          <p class="text-xs text-black/50 dark:text-white/50">SVG, PNG, JPG o GIF (MAX. 10MB)</p>
-                        </div>
-                        <input id="dropzone-file" type="file" accept="image/*,video/*" multiple/>
-                      </label>
-                    </div>
-                    <div id="file-preview" class="mt-2"></div>
-                  </div>
-                  <div class="flex flex-col">
-                    <label class="text-black dark:text-white text-sm font-medium leading-normal pb-2" for="description">Describa la Situación</label>
-                    <textarea class="form-textarea w-full min-w-0 resize-y overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-black/20 dark:border-white/20 bg-background-light dark:bg-background-dark/50 focus:border-primary/50 placeholder:text-black/40 dark:placeholder:text-white/40 p-3 text-base font-normal leading-normal" id="description" placeholder="Añada notas cualitativas aquí..." rows="4" required></textarea>
-                  </div>
-                  <button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-primary text-black gap-2 text-base font-bold leading-normal tracking-[0.015em] px-6 hover:brightness-90 transition-all" type="submit">Enviar Reporte</button>
-                </form>
-                <div id="success-message" class="success-message">¡Reporte enviado exitosamente!</div>
-                <div id="error-message" class="error-message">Error al enviar el reporte. Por favor, inténtelo de nuevo.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  </div>
 
-  <script src="script.js"></script>
-</body>
-</html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RCU Soacha Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#002468", "background-light": "#f5f6f8", "background-dark": "#0f1623"}, fontFamily: {display: "Sora"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}}}};</script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+    }
+  </style>
+</head>
+<body class="font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-white/10 px-6 sm:px-10 py-3 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-10">
+<div class="flex items-center gap-4 text-slate-800 dark:text-white">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-slate-800 dark:text-white text-lg font-bold leading-tight tracking-tight">RCU Soacha Dashboard</h2>
+</div>
+<div class="flex items-center justify-end gap-2">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide hover:bg-primary/90 transition-colors">
+<span class="truncate">Add Widget</span>
+</button>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white text-sm font-bold leading-normal tracking-wide hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<span class="truncate">Save Layout</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white gap-2 text-sm font-bold leading-normal tracking-wide min-w-0 px-2.5 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBZTjwMaE9JSQKiwzhOZ10XjA_swlS9h5PUW38KfF2UfaUxXhoYyJ9gyU5PDLIY7AfI7uSu3hRJupYYtqfuKvXah1sJeoDsBlgMGl6NPGKd9Fu7dRxtvsAV1ZpdJJgdvlYnpzhsQl1mTyWXesntIIMNLEHQ8mOU4OsPJslS3jArWm7cA6O89D7c0BeqbrPFsp0AQHQSeeiILapkxeJbnnA06cXt49wicnSfNYVJOwCWd2o3udZtnqseJrYdwLJwJmiXyWBbwXyv0xs");'></div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-4 sm:px-6 md:px-10 py-5">
+<div class="layout-content-container flex flex-col w-full mx-auto">
+<!-- SectionHeader -->
+<h2 class="text-slate-800 dark:text-white text-[22px] font-bold leading-tight tracking-tight px-4 pb-3 pt-5">My Dashboard</h2>
+<!-- Chips -->
+<div class="flex gap-3 p-3 overflow-x-auto">
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-200 dark:bg-slate-800 px-3 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal">Date Range: Last 7 Days</p>
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 text-xl">expand_more</span>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-200 dark:bg-slate-800 px-3 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal">Event Type: All</p>
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 text-xl">expand_more</span>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-200 dark:bg-slate-800 px-3 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal">Area: Soacha</p>
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 text-xl">expand_more</span>
+</button>
+</div>
+<!-- Widgets Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4">
+<!-- Map Widget -->
+<div class="lg:col-span-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<h3 class="text-lg font-bold text-slate-800 dark:text-white">Interactive Map</h3>
+<button id="toggle-map-layers" class="text-sm bg-primary text-white px-3 py-1 rounded hover:bg-primary/90">Layers</button>
+</div>
+<div id="map" class="w-full aspect-video rounded-lg z-0" style="min-height: 400px;"></div>
+</div>
+<!-- Predictive Alerts Widget -->
+<div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-4">
+<h3 class="text-lg font-bold text-slate-800 dark:text-white">Predictive Alerts</h3>
+<div id="alerts-container" class="flex flex-col gap-3 overflow-y-auto max-h-96">
+<!-- Alerts will be dynamically loaded here -->
+<div class="flex items-start gap-3 p-3 rounded-lg bg-red-500/10">
+<span class="material-symbols-outlined text-red-500 mt-1">error</span>
+<div class="flex flex-col">
+<p class="font-bold text-red-500">High Flood Risk: Sector 3</p>
+<p class="text-sm text-slate-600 dark:text-slate-400">Heavy rainfall predicted. Potential for significant flooding in low-lying areas.</p>
+<p class="text-xs text-slate-500 dark:text-slate-500 mt-1" id="alert-time-1">2 hours ago</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10">
+<span class="material-symbols-outlined text-amber-500 mt-1">warning</span>
+<div class="flex flex-col">
+<p class="font-bold text-amber-500">Heatwave Warning</p>
+<p class="text-sm text-slate-600 dark:text-slate-400">Temperatures expected to exceed 35°C. Advise vulnerable populations to stay hydrated.</p>
+<p class="text-xs text-slate-500 dark:text-slate-500 mt-1" id="alert-time-2">8 hours ago</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-lg bg-green-500/10">
+<span class="material-symbols-outlined text-green-500 mt-1">check_circle</span>
+<div class="flex flex-col">
+<p class="font-bold text-green-500">Air Quality: Good</p>
+<p class="text-sm text-slate-600 dark:text-slate-400">Current air quality index is within safe levels. No immediate concerns.</p>
+<p class="text-xs text-slate-500 dark:text-slate-500 mt-1" id="alert-time-3">1 day ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Charts -->
+<div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2 rounded-xl border border-slate-200 dark:border-slate-800 p-6 bg-white dark:bg-slate-900">
+<p class="text-slate-700 dark:text-slate-300 text-base font-medium leading-normal">Population Affected by Event</p>
+<p id="affected-population" class="text-slate-900 dark:text-white tracking-tight text-[32px] font-bold leading-tight truncate">1,250</p>
+<div class="flex gap-1 items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Last 7 Days</p>
+<p id="population-trend" class="text-green-500 text-sm font-medium leading-normal flex items-center gap-1"><span class="material-symbols-outlined text-base">arrow_upward</span>+15%</p>
+</div>
+<div class="w-full" style="max-height: 200px;">
+<canvas id="populationChart"></canvas>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl border border-slate-200 dark:border-slate-800 p-6 bg-white dark:bg-slate-900">
+<p class="text-slate-700 dark:text-slate-300 text-base font-medium leading-normal">Historical Event Trends</p>
+<p id="historical-events" class="text-slate-900 dark:text-white tracking-tight text-[32px] font-bold leading-tight truncate">3 Major Events</p>
+<div class="flex gap-1 items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Last 12 Months</p>
+<p id="events-trend" class="text-red-500 text-sm font-medium leading-normal flex items-center gap-1"><span class="material-symbols-outlined text-base">arrow_downward</span>-5%</p>
+</div>
+<div class="w-full" style="max-height: 200px;">
+<canvas id="trendsChart"></canvas>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = L.map('map').setView([4.58, -74.21], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add sample markers for incidents
+    const incidents = [
+        {lat: 4.59, lng: -74.22, title: 'Flood Risk - Sector 1', type: 'flood'},
+        {lat: 4.57, lng: -74.20, title: 'Heatwave Alert - Sector 3', type: 'heat'},
+        {lat: 4.58, lng: -74.21, title: 'Air Quality Monitoring', type: 'air'}
+    ];
+
+    incidents.forEach(incident => {
+        let color = incident.type === 'flood' ? 'red' : incident.type === 'heat' ? 'orange' : 'green';
+        L.circleMarker([incident.lat, incident.lng], {
+            color: color,
+            fillColor: color,
+            fillOpacity: 0.7,
+            radius: 10
+        }).addTo(map).bindPopup(incident.title);
+    });
+
+    // Initialize population chart
+    const ctx = document.getElementById('populationChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Population Affected',
+                    data: [700, 100, 600, 900, 1000, 300, 1000],
+                    backgroundColor: '#002468',
+                    borderColor: '#002468',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {display: false}
+                },
+                scales: {
+                    y: {beginAtZero: true}
+                }
+            }
+        });
+    }
+
+    // Initialize trends chart
+    const trendsCtx = document.getElementById('trendsChart');
+    if (trendsCtx) {
+        new Chart(trendsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Historical Events',
+                    data: [3, 2, 1, 4, 2, 3, 2],
+                    borderColor: '#002468',
+                    backgroundColor: 'rgba(0, 36, 104, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {display: false}
+                },
+                scales: {
+                    y: {beginAtZero: true, max: 5}
+                }
+            }
+        });
+    }
+
+    // Dynamically update alert times
+    function updateAlertTimes() {
+        document.getElementById('alert-time-1').textContent = '2 hours ago';
+        document.getElementById('alert-time-2').textContent = '8 hours ago';
+        document.getElementById('alert-time-3').textContent = '1 day ago';
+    }
+    updateAlertTimes();
+
+    // Load data from API (replacing localStorage)
+    async function loadDashboardData() {
+        try {
+            const response = await fetch('/api/reports');
+            const reports = await response.json();
+            const populationAffected = reports.length * 50; // Mock calculation
+            document.getElementById('affected-population').textContent = populationAffected.toLocaleString();
+            
+            // Update trend indicator
+            const trend = reports.length > 0 ? '+' + (reports.length * 10) + '%' : '+0%';
+            document.getElementById('population-trend').innerHTML = `<span class="material-symbols-outlined text-base">arrow_upward</span>${trend}`;
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
+    }
+    loadDashboardData();
+
+    // Add button functionality
+    document.querySelector('.flex.min-w-\\[84px\\]:first-of-type')?.addEventListener('click', function() {
+        alert('Add Widget functionality - would open a modal to configure new widgets');
+    });
+
+    document.querySelector('button:contains("Save Layout")')?.addEventListener('click', async function() {
+        try {
+            const response = await fetch('/api/dashboard/layout', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({timestamp: new Date().toISOString()})
+            });
+            if (response.ok) {
+                alert('Dashboard layout saved successfully!');
+            } else {
+                alert('Error saving layout');
+            }
+        } catch (error) {
+            console.error('Error saving layout:', error);
+            alert('Error saving layout');
+        }
+    });
+
+    document.getElementById('toggle-map-layers')?.addEventListener('click', function() {
+        alert('Layer controls - temperature, flood risk, population density, zones');
+    });
+});
+</script>
+</body></html>

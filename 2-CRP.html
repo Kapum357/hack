@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#002468", "background-light": "#f5f6f8", "background-dark": "#0f1623"}, fontFamily: {display: "Sora"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}}}};</script>
 <style>
         .material-symbols-outlined {
@@ -51,7 +53,7 @@
 </div>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-<div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl object-cover h-full min-h-[400px] lg:min-h-[700px] sticky top-24" data-alt="Interactive map showing the Soacha area with streets and buildings, ready for a pin drop." data-location="Soacha, Colombia" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDv5-dxl0XpOb5VFWy9vUSRrouhynjie1ynIhCvL_0p5Pz9lnotOXELZOEPlFqVJH9ZhF_m-g0vrnSVNKiQDeCQEZImGoNq--QeKMSOzMuUy3t-wJmwBxyyBcwMZ2B6G0yXxiVYLgIpqHFlt_gE_a3e8MSFNTmPI6RigxGMaXHvCWxLZMlhW8jpI7jf3LJ1ThgZEfw_uJQIE9tDh4ZEra-U7uS5cfJU4mE-YsZCsOBMT-gqAPpe-3l3q_yE4PXGRaDLnYww8SANZXU");'></div>
+<div id="map" class="w-full rounded-xl h-full min-h-[400px] lg:min-h-[700px] sticky top-24"></div>
 <div class="flex flex-col gap-6">
 <div class="bg-background-light dark:bg-black/20 border border-black/10 dark:border-white/10 p-6 rounded-xl">
 <h2 class="text-black dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] mb-6">Detalles del Reporte</h2>
@@ -106,4 +108,154 @@
 </main>
 </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = L.map('map').setView([4.58, -74.21], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker;
+
+    // Click on map to set location
+    map.on('click', function(e) {
+        const { lat, lng } = e.latlng;
+        document.getElementById('latitude').value = lat.toFixed(4);
+        document.getElementById('longitude').value = lng.toFixed(4);
+
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        marker = L.marker([lat, lng]).addTo(map);
+    });
+
+    // Set default date
+    document.getElementById('event-date').value = new Date().toISOString().slice(0, 16);
+
+    // File upload handling
+    const dropzone = document.getElementById('dropzone-file');
+    const fileLabel = dropzone.parentElement;
+    let selectedFiles = [];
+
+    dropzone.addEventListener('change', function(e) {
+        selectedFiles = Array.from(e.target.files);
+        updateFilePreview();
+    });
+
+    // Drag and drop
+    fileLabel.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileLabel.classList.add('bg-black/10', 'dark:bg-white/10');
+    });
+
+    fileLabel.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileLabel.classList.remove('bg-black/10', 'dark:bg-white/10');
+    });
+
+    fileLabel.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileLabel.classList.remove('bg-black/10', 'dark:bg-white/10');
+        selectedFiles = Array.from(e.dataTransfer.files);
+        // Simulate setting files to input
+        dropzone.files = e.dataTransfer.files;
+        updateFilePreview();
+    });
+
+    function updateFilePreview() {
+        const previewDiv = document.createElement('div');
+        previewDiv.id = 'file-preview';
+        previewDiv.className = 'mt-4 space-y-2';
+
+        selectedFiles.forEach((file, index) => {
+            if (file.size > 10 * 1024 * 1024) {
+                alert(`Archivo ${file.name} es demasiado grande. Máximo 10MB.`);
+                selectedFiles.splice(index, 1);
+                return;
+            }
+            const fileItem = document.createElement('div');
+            fileItem.className = 'flex items-center gap-2 p-2 bg-black/5 dark:bg-white/5 rounded';
+            fileItem.innerHTML = `
+                <span class="material-symbols-outlined text-sm">attach_file</span>
+                <span class="text-sm">${file.name}</span>
+                <span class="text-xs text-black/50 dark:text-white/50">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+            `;
+            previewDiv.appendChild(fileItem);
+        });
+
+        // Remove old preview
+        const oldPreview = document.getElementById('file-preview');
+        if (oldPreview) oldPreview.remove();
+
+        fileLabel.parentElement.appendChild(previewDiv);
+    }
+
+    // Form submission
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const report = {
+            eventType: formData.get('event-type'),
+            dateTime: formData.get('event-date'),
+            latitude: document.getElementById('latitude').value,
+            longitude: document.getElementById('longitude').value,
+            description: formData.get('description'),
+            files: selectedFiles.map(file => ({
+                name: file.name,
+                size: file.size,
+                type: file.type
+            })),
+            id: Date.now(),
+            timestamp: new Date().toISOString()
+        };
+
+        // Validation
+        if (!report.eventType || report.eventType === 'Seleccione un tipo de evento') {
+            showMessage('Por favor seleccione un tipo de evento.', 'error');
+            return;
+        }
+        if (!report.dateTime) {
+            showMessage('Por favor seleccione fecha y hora.', 'error');
+            return;
+        }
+        if (!report.latitude || !report.longitude) {
+            showMessage('Por favor haga clic en el mapa para seleccionar la ubicación.', 'error');
+            return;
+        }
+        if (!report.description.trim()) {
+            showMessage('Por favor describa la situación.', 'error');
+            return;
+        }
+
+        // Save to localStorage (simulate backend)
+        const reports = JSON.parse(localStorage.getItem('communityReports') || '[]');
+        reports.push(report);
+        localStorage.setItem('communityReports', JSON.stringify(reports));
+
+        showMessage('Reporte enviado exitosamente. Gracias por su contribución.', 'success');
+
+        // Reset form
+        form.reset();
+        document.getElementById('latitude').value = '';
+        document.getElementById('longitude').value = '';
+        if (marker) map.removeLayer(marker);
+        selectedFiles = [];
+        const preview = document.getElementById('file-preview');
+        if (preview) preview.remove();
+        document.getElementById('event-date').value = new Date().toISOString().slice(0, 16);
+    });
+
+    function showMessage(message, type) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
+        msgDiv.textContent = message;
+        document.body.appendChild(msgDiv);
+        setTimeout(() => msgDiv.remove(), 5000);
+    }
+});
+</script>
 </body></html>
