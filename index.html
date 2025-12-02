@@ -38,7 +38,7 @@
 <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide hover:bg-primary/90 transition-colors">
 <span class="truncate">Add Widget</span>
 </button>
-<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white text-sm font-bold leading-normal tracking-wide hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<button id="save-layout" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white text-sm font-bold leading-normal tracking-wide hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
 <span class="truncate">Save Layout</span>
 </button>
 <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white gap-2 text-sm font-bold leading-normal tracking-wide min-w-0 px-2.5 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Add Widget functionality - would open a modal to configure new widgets');
     });
 
-    document.querySelector('button:contains("Save Layout")')?.addEventListener('click', async function() {
+    document.getElementById('save-layout')?.addEventListener('click', async function() {
         try {
             const response = await fetch('/api/dashboard/layout', {
                 method: 'POST',
