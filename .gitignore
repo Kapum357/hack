@@ -2,3 +2,4 @@
 .env*.local
 .github
 .venv
+node_modules
