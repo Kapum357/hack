@@ -1,5 +1,8 @@
 {
   "private": true,
+  "scripts": {
+    "build": "echo 'Static site - no build required'"
+  },
   "dependencies": {
     "@vercel/edge": "^0.1.2"
   }
