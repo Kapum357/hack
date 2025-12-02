@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestión de Fotografías de Referencia - RCU Soacha</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#002468",
+                    "background-light": "#f5f6f8",
+                    "background-dark": "#0f1623"
+                },
+                fontFamily: {
+                    display: "Sora"
+                }
+            }
+        }
+    };
+</script>
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+    <!-- Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-white/10 px-6 sm:px-10 py-3 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-10">
+        <div class="flex items-center gap-4 text-slate-800 dark:text-white">
+            <div class="size-6 text-primary">
+                <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 4L4 12v12c0 11 7 21 20 24 13-3 20-13 20-24V12L24 4z"></path>
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold">Fotografías de Referencia - RCU Soacha</h2>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="view-stats" class="px-4 py-2 bg-primary text-white rounded-lg hover:brightness-90">
+                <span class="material-symbols-outlined text-sm">analytics</span> Estadísticas
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-4 sm:px-6 md:px-10 py-5">
+        <div class="max-w-7xl mx-auto">
+            <!-- Upload Section -->
+            <div class="mb-8 bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-4">Subir Nueva Fotografía</h3>
+                <form id="uploadForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Archivo de Imagen</label>
+                            <input type="file" id="fileInput" name="file" accept="image/*" required
+                                   class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tipo de Evento</label>
+                            <select id="eventType" name="event_type" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                                <option value="general">General</option>
+                                <option value="inundacion">Inundación</option>
+                                <option value="deslizamiento">Deslizamiento</option>
+                                <option value="infraestructura">Infraestructura</option>
+                                <option value="comunidad">Actividad Comunitaria</option>
+                                <option value="clima">Evento Climático</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Descripción</label>
+                        <textarea id="description" name="description" rows="2"
+                                  class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nombre de Ubicación</label>
+                            <input type="text" id="locationName" name="location_name" placeholder="Ej: Barrio El Danubio"
+                                   class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Latitud (opcional)</label>
+                            <input type="number" id="latitude" name="latitude" step="0.000001" placeholder="4.5828"
+                                   class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Longitud (opcional)</label>
+                            <input type="number" id="longitude" name="longitude" step="0.000001" placeholder="-74.2120"
+                                   class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Etiquetas (separadas por comas)</label>
+                        <input type="text" id="tags" name="tags" placeholder="clima, emergencia, 2024"
+                               class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                    </div>
+                    <button type="submit" class="w-full px-6 py-3 bg-primary text-white rounded-lg font-bold hover:brightness-90">
+                        Subir Fotografía
+                    </button>
+                </form>
+                <div id="uploadStatus" class="mt-4"></div>
+            </div>
+
+            <!-- Filters -->
+            <div class="mb-6 bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                    <select id="filterEventType" class="px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                        <option value="">Todos los eventos</option>
+                        <option value="inundacion">Inundación</option>
+                        <option value="deslizamiento">Deslizamiento</option>
+                        <option value="infraestructura">Infraestructura</option>
+                        <option value="comunidad">Actividad Comunitaria</option>
+                        <option value="clima">Evento Climático</option>
+                    </select>
+                    <select id="filterGeo" class="px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                        <option value="">Todas las fotos</option>
+                        <option value="true">Solo georreferenciadas</option>
+                        <option value="false">Sin georreferencia</option>
+                    </select>
+                    <input type="text" id="filterLocation" placeholder="Buscar ubicación..."
+                           class="px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                    <button id="applyFilters" class="px-4 py-2 bg-primary text-white rounded-lg hover:brightness-90">
+                        Aplicar Filtros
+                    </button>
+                    <button id="clearFilters" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg hover:brightness-90">
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Photo Grid -->
+            <div id="photoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+                <!-- Photos will be loaded here -->
+            </div>
+
+            <!-- Map View -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-4">Mapa de Fotografías Georreferenciadas</h3>
+                <div id="map" class="w-full h-96 rounded-lg"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Photo Modal -->
+<div id="photoModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white">Detalles de la Fotografía</h3>
+                <button id="closeModal" class="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:5000/api';
+let currentPhotos = [];
+
+// Upload form handler
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    const status = document.getElementById('uploadStatus');
+    status.innerHTML = '<p class="text-blue-500">Subiendo...</p>';
+    
+    try {
+        const response = await fetch(`${API_BASE}/photos/upload`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            status.innerHTML = '<p class="text-green-500 font-bold">✓ Fotografía subida exitosamente</p>';
+            e.target.reset();
+            loadPhotos();
+        } else {
+            status.innerHTML = `<p class="text-red-500">Error: ${result.error}</p>`;
+        }
+    } catch (error) {
+        status.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+    }
+});
+
+// Load photos
+async function loadPhotos(filters = {}) {
+    const params = new URLSearchParams(filters);
+    const response = await fetch(`${API_BASE}/photos?${params}`);
+    const data = await response.json();
+    currentPhotos = data.photos;
+    
+    displayPhotos(data.photos);
+    updateMap(data.photos);
+}
+
+// Display photos in grid
+function displayPhotos(photos) {
+    const grid = document.getElementById('photoGrid');
+    
+    if (photos.length === 0) {
+        grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-8">No se encontraron fotografías</p>';
+        return;
+    }
+    
+    grid.innerHTML = photos.map(photo => `
+        <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+             onclick="showPhotoDetails('${photo.id}')">
+            <div class="aspect-square bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                ${photo.thumbnail ? 
+                    `<img src="${photo.thumbnail}" class="w-full h-full object-cover" alt="${photo.description}">` :
+                    '<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-4xl text-slate-400">image</span></div>'
+                }
+            </div>
+            <div class="p-3">
+                <p class="text-xs text-primary font-bold mb-1">${photo.event_type || 'general'}</p>
+                <p class="text-sm text-slate-800 dark:text-white font-semibold line-clamp-2 mb-2">${photo.description || 'Sin descripción'}</p>
+                ${photo.location_name ? `<p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span>${photo.location_name}</p>` : ''}
+                <div class="flex items-center justify-between mt-2">
+                    <span class="text-xs text-slate-500">${new Date(photo.upload_date).toLocaleDateString('es-CO')}</span>
+                    ${photo.latitude && photo.longitude ? '<span class="text-xs text-green-500">✓ Georreferenciada</span>' : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Show photo details in modal
+async function showPhotoDetails(photoId) {
+    const response = await fetch(`${API_BASE}/photos/${photoId}`);
+    const photo = await response.json();
+    
+    const modal = document.getElementById('photoModal');
+    const content = document.getElementById('modalContent');
+    
+    content.innerHTML = `
+        <div class="space-y-4">
+            <img src="/api/photos/image/${photo.id}" class="w-full rounded-lg" alt="${photo.description}">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Tipo de Evento</p>
+                    <p class="text-lg font-bold text-slate-800 dark:text-white">${photo.event_type || 'N/A'}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Fecha de Subida</p>
+                    <p class="text-lg font-bold text-slate-800 dark:text-white">${new Date(photo.upload_date).toLocaleString('es-CO')}</p>
+                </div>
+            </div>
+            <div>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Descripción</p>
+                <p class="text-slate-800 dark:text-white">${photo.description || 'Sin descripción'}</p>
+            </div>
+            ${photo.location_name ? `
+                <div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Ubicación</p>
+                    <p class="text-slate-800 dark:text-white">${photo.location_name}</p>
+                </div>
+            ` : ''}
+            ${photo.latitude && photo.longitude ? `
+                <div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Coordenadas</p>
+                    <p class="text-slate-800 dark:text-white">${photo.latitude.toFixed(6)}, ${photo.longitude.toFixed(6)}</p>
+                    <p class="text-xs text-slate-500">${photo.georeference_source === 'exif' ? 'Extraídas de EXIF' : 'Ingresadas manualmente'}</p>
+                </div>
+            ` : ''}
+            ${photo.tags && photo.tags.length > 0 ? `
+                <div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Etiquetas</p>
+                    <div class="flex flex-wrap gap-2">
+                        ${photo.tags.map(tag => `<span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            <button onclick="deletePhoto('${photo.id}')" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:brightness-90">
+                Eliminar Fotografía
+            </button>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
+
+// Delete photo
+async function deletePhoto(photoId) {
+    if (!confirm('¿Está seguro de eliminar esta fotografía?')) return;
+    
+    const response = await fetch(`${API_BASE}/photos/${photoId}`, { method: 'DELETE' });
+    const result = await response.json();
+    
+    if (result.success) {
+        document.getElementById('photoModal').classList.add('hidden');
+        loadPhotos();
+    }
+}
+
+// Close modal
+document.getElementById('closeModal').addEventListener('click', () => {
+    document.getElementById('photoModal').classList.add('hidden');
+});
+
+// Apply filters
+document.getElementById('applyFilters').addEventListener('click', () => {
+    const filters = {};
+    const eventType = document.getElementById('filterEventType').value;
+    const geo = document.getElementById('filterGeo').value;
+    const location = document.getElementById('filterLocation').value;
+    
+    if (eventType) filters.event_type = eventType;
+    if (geo) filters.georeferenced = geo;
+    if (location) filters.location = location;
+    
+    loadPhotos(filters);
+});
+
+// Clear filters
+document.getElementById('clearFilters').addEventListener('click', () => {
+    document.getElementById('filterEventType').value = '';
+    document.getElementById('filterGeo').value = '';
+    document.getElementById('filterLocation').value = '';
+    loadPhotos();
+});
+
+// View stats
+document.getElementById('view-stats').addEventListener('click', async () => {
+    const response = await fetch(`${API_BASE}/photos/stats`);
+    const stats = await response.json();
+    
+    alert(`Estadísticas de Fotografías\n\n` +
+          `Total: ${stats.total_photos}\n` +
+          `Georreferenciadas: ${stats.georeferenced}\n` +
+          `Sin georreferencia: ${stats.not_georeferenced}\n` +
+          `Etiquetas únicas: ${stats.total_tags}`);
+});
+
+// Initialize map
+let map;
+function initMap() {
+    map = L.map('map').setView([4.58, -74.21], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+}
+
+// Update map with photos
+async function updateMap(photos) {
+    if (!map) return;
+    
+    // Clear existing markers
+    map.eachLayer(layer => {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
+    
+    // Load GeoJSON
+    const response = await fetch(`${API_BASE}/photos/geojson`);
+    const geojson = await response.json();
+    
+    // Add markers
+    L.geoJSON(geojson, {
+        pointToLayer: (feature, latlng) => {
+            return L.marker(latlng);
+        },
+        onEachFeature: (feature, layer) => {
+            const props = feature.properties;
+            layer.bindPopup(`
+                <strong>${props.event_type || 'Foto'}</strong><br>
+                ${props.description || ''}<br>
+                <a href="#" onclick="showPhotoDetails('${props.id}'); return false;">Ver detalles</a>
+            `);
+        }
+    }).addTo(map);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    loadPhotos();
+});
+</script>
+</body>
+</html>
