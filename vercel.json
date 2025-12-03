@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/**/*.py": {
+      "excludeFiles": "{node_modules/**,__pycache__/**,.git/**,.env*,*.log,assets/**}"
+    }
+  }
+}
