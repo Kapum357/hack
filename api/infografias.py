@@ -28,5 +28,7 @@ def serve_infografia(filename):
     return send_from_directory(INFOGRAFIA_DIR, filename)
 
 # Vercel handler
+from vercel_wsgi import handle_wsgi
+
 def handler(event, context):
-    return app(event, context)
+    return handle_wsgi(app, event, context)

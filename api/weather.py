@@ -167,5 +167,7 @@ def get_predictive_alerts():
     })
 
 # Vercel handler
+from vercel_wsgi import handle_wsgi
+
 def handler(event, context):
-    return app(event, context)
+    return handle_wsgi(app, event, context)

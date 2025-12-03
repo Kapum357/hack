@@ -4,3 +4,4 @@ fiona==1.9.6
 shapely==2.0.2
 requests==2.31.0
 Pillow==10.1.0
+vercel-wsgi

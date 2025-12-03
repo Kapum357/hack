@@ -913,3 +913,9 @@ def get_photos_stats():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+# Vercel handler
+from vercel_wsgi import handle_wsgi
+
+def handler(event, context):
+    return handle_wsgi(app, event, context)

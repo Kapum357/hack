@@ -425,5 +425,7 @@ def get_photos_stats():
         return jsonify({'error': str(e)}), 500
 
 # Vercel handler
+from vercel_wsgi import handle_wsgi
+
 def handler(event, context):
-    return app(event, context)
+    return handle_wsgi(app, event, context)

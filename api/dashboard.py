@@ -61,5 +61,7 @@ def get_analytics_summary():
     return jsonify(summary)
 
 # Vercel handler
+from vercel_wsgi import handle_wsgi
+
 def handler(event, context):
-    return app(event, context)
+    return handle_wsgi(app, event, context)
