@@ -1,0 +1,25 @@
+{
+  "functions": {
+    "api/reports.py": {
+      "excludeFiles": "{node_modules/**,__pycache__/**,.git/**,.env*,*.log,assets/**}"
+    },
+    "api/alerts.py": {
+      "excludeFiles": "{node_modules/**,__pycache__/**,.git/**,.env*,*.log,assets/**}"
+    },
+    "api/geolayers.py": {
+      "excludeFiles": "{node_modules/**,__pycache__/**,.git/**,.env*,*.log}"
+    },
+    "api/weather.py": {
+      "excludeFiles": "{node_modules/**,__pycache__/**,.git/**,.env*,*.log,assets/**}"
+    },
+    "api/infografias.py": {
+      "excludeFiles": "{node_modules/**,__pycache__/**,.git/**,.env*,*.log}"
+    },
+    "api/photos.py": {
+      "excludeFiles": "{node_modules/**,__pycache__/**,.git/**,.env*,*.log}"
+    },
+    "api/dashboard.py": {
+      "excludeFiles": "{node_modules/**,__pycache__/**,.git/**,.env*,*.log,assets/**}"
+    }
+  }
+}
