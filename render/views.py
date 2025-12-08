@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import FloodThreat, SocialVulnerability
+import json
 
 # Create your views here.
 def index(request):
@@ -24,10 +25,7 @@ def flood_layer(request):
                 'description': threat.description,
                 'threat_level': threat.threat_level,
             },
-            'geometry': {
-                'type': threat.geometry.geom_type,
-                'coordinates': threat.geometry.coords,
-            }
+            'geometry': json.loads(threat.geometry.json),
         })
     
     geojson_data = {
@@ -54,10 +52,7 @@ def vulnerability_layer(request):
                 'affected_population': vuln.affected_population,
                 'linked_families': vuln.linked_families,
             },
-            'geometry': {
-                'type': vuln.geometry.geom_type,
-                'coordinates': vuln.geometry.coords,
-            }
+            'geometry': json.loads(vuln.geometry.json),
         })
     
     geojson_data = {

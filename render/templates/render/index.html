@@ -140,7 +140,9 @@
                 onEachFeature: function(feature, layer) {
                     var props = feature.properties;
                     var popupContent = '<b>' + props.name + '</b><br>';
-                    popupContent += 'Índice de vulnerabilidad: ' + props.vulnerability_index.toFixed(2) + '<br>';
+                    if (props.vulnerability_index != null) {
+                        popupContent += 'Índice de vulnerabilidad: ' + props.vulnerability_index.toFixed(2) + '<br>';
+                    }
                     popupContent += 'Población afectada: ' + props.affected_population + '<br>';
                     popupContent += 'Familias vinculadas: ' + props.linked_families + '<br>';
                     if (props.description) {
