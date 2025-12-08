@@ -71,8 +71,124 @@
     var marker = L.marker([4.580, -74.220]).addTo(map);
     marker.bindPopup("<b>Soacha Centro</b><br>Punto de referencia.").openPopup();
 
-    // TODO: Load GeoJSON layers from API
-    // fetch('/api/layers/inundacion').then(...)
+    // Layer groups for managing layers
+    var floodLayer = L.layerGroup();
+    var vulnerabilityLayer = L.layerGroup();
+
+    // Load GeoJSON layers from API
+    
+    // Fetch flood threat layer
+    fetch('/api/layers/inundacion')
+        .then(response => response.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: function(feature) {
+                    // Color based on threat level
+                    var color;
+                    switch(feature.properties.threat_level) {
+                        case 'VERY_HIGH': color = '#d73027'; break;
+                        case 'HIGH': color = '#fc8d59'; break;
+                        case 'MEDIUM': color = '#fee08b'; break;
+                        case 'LOW': color = '#91bfdb'; break;
+                        default: color = '#999999';
+                    }
+                    return {
+                        fillColor: color,
+                        weight: 2,
+                        opacity: 1,
+                        color: 'white',
+                        fillOpacity: 0.5
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    var popupContent = '<b>' + feature.properties.name + '</b><br>';
+                    popupContent += 'Nivel de amenaza: ' + feature.properties.threat_level + '<br>';
+                    if (feature.properties.description) {
+                        popupContent += feature.properties.description;
+                    }
+                    layer.bindPopup(popupContent);
+                }
+            }).addTo(floodLayer);
+            
+            // Add to map by default (checkbox is checked)
+            floodLayer.addTo(map);
+        })
+        .catch(error => console.error('Error loading flood layer:', error));
+
+    // Fetch vulnerability layer
+    fetch('/api/layers/vulnerabilidad')
+        .then(response => response.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: function(feature) {
+                    // Color based on vulnerability index (0 to 1)
+                    var index = feature.properties.vulnerability_index;
+                    var color;
+                    if (index >= 0.75) color = '#d73027';
+                    else if (index >= 0.5) color = '#fc8d59';
+                    else if (index >= 0.25) color = '#fee08b';
+                    else color = '#91bfdb';
+                    
+                    return {
+                        fillColor: color,
+                        weight: 2,
+                        opacity: 1,
+                        color: 'white',
+                        fillOpacity: 0.6
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    var props = feature.properties;
+                    var popupContent = '<b>' + props.name + '</b><br>';
+                    if (props.vulnerability_index != null) {
+                        popupContent += 'Índice de vulnerabilidad: ' + props.vulnerability_index.toFixed(2) + '<br>';
+                    }
+                    popupContent += 'Población afectada: ' + props.affected_population + '<br>';
+                    popupContent += 'Familias vinculadas: ' + props.linked_families + '<br>';
+                    if (props.description) {
+                        popupContent += props.description;
+                    }
+                    layer.bindPopup(popupContent);
+                }
+            }).addTo(vulnerabilityLayer);
+            
+            // Update statistics
+            updateStatistics(data);
+        })
+        .catch(error => console.error('Error loading vulnerability layer:', error));
+
+    // Layer toggle handlers
+    document.getElementById('layerInundacion').addEventListener('change', function(e) {
+        if (e.target.checked) {
+            floodLayer.addTo(map);
+        } else {
+            map.removeLayer(floodLayer);
+        }
+    });
+
+    document.getElementById('layerVulnerabilidad').addEventListener('change', function(e) {
+        if (e.target.checked) {
+            vulnerabilityLayer.addTo(map);
+        } else {
+            map.removeLayer(vulnerabilityLayer);
+        }
+    });
+
+    // Update statistics from vulnerability data
+    function updateStatistics(geojsonData) {
+        var totalAffected = 0;
+        var totalLinked = 0;
+        
+        if (geojsonData.features) {
+            geojsonData.features.forEach(function(feature) {
+                totalAffected += feature.properties.affected_population || 0;
+                totalLinked += feature.properties.linked_families || 0;
+            });
+        }
+        
+        document.getElementById('stats-affected').textContent = totalAffected.toLocaleString();
+        document.getElementById('stats-linked').textContent = totalLinked.toLocaleString();
+    }
 </script>
 
 </body>
