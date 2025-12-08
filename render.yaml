@@ -6,8 +6,8 @@ databases:
 
 services:
   - type: web
+    name: soacha-web
     plan: free
-    name: hack
     runtime: python
     buildCommand: "./build.sh"
     startCommand: "python -m gunicorn hack.asgi:application -k uvicorn.workers.UvicornWorker"
@@ -16,7 +16,52 @@ services:
         fromDatabase:
           name: hackdb
           property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: soacha-redis
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
+    healthCheckPath: /healthz
+
+  - type: worker
+    name: soacha-worker
+    plan: free
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "celery -A hack worker -l info"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hackdb
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: soacha-redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+
+  - type: cron
+    name: soacha-cron-ingest
+    plan: free
+    runtime: python
+    schedule: "0 0 * * *"
+    buildCommand: "./build.sh"
+    startCommand: "python manage.py ingest_data"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hackdb
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+
+  - type: redis
+    name: soacha-redis
+    plan: free
+    ipAllowList: []

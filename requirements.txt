@@ -11,3 +11,5 @@ sqlparse==0.4.4
 typing_extensions==4.9.0
 uvicorn==0.27.0.post1
 whitenoise==6.6.0
+celery==5.3.6
+redis==5.0.1
