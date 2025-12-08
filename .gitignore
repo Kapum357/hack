@@ -1,2 +1,12 @@
 __pycache__
 venv
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+.DS_Store
+staticfiles/
+data/*.geojson
+data/*.kml
+data/*.json
+!data/README.md
