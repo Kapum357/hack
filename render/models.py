@@ -4,16 +4,19 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class FloodThreat(models.Model):
     """Model for storing flood threat areas"""
+    
+    THREAT_LEVEL_CHOICES = [
+        ('LOW', 'Low'),
+        ('MEDIUM', 'Medium'),
+        ('HIGH', 'High'),
+        ('VERY_HIGH', 'Very High'),
+    ]
+    
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     threat_level = models.CharField(
         max_length=50, 
-        choices=[
-            ('LOW', 'Low'),
-            ('MEDIUM', 'Medium'),
-            ('HIGH', 'High'),
-            ('VERY_HIGH', 'Very High'),
-        ],
+        choices=THREAT_LEVEL_CHOICES,
         default='MEDIUM'
     )
     geometry = models.MultiPolygonField(srid=4326)
@@ -41,11 +44,13 @@ class SocialVulnerability(models.Model):
     )
     affected_population = models.IntegerField(
         default=0,
-        help_text="Estimated affected population"
+        help_text="Estimated affected population",
+        validators=[MinValueValidator(0)]
     )
     linked_families = models.IntegerField(
         default=0,
-        help_text="Number of families linked to Red Cross programs"
+        help_text="Number of families linked to Red Cross programs",
+        validators=[MinValueValidator(0)]
     )
     geometry = models.MultiPolygonField(srid=4326)
     created_at = models.DateTimeField(auto_now_add=True)

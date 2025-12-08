@@ -94,10 +94,16 @@ class Command(BaseCommand):
                 )
                 properties = feature.get('properties', {})
                 
+                # Validate threat_level against model choices
+                threat_level = properties.get('threat_level', 'MEDIUM').upper()
+                valid_levels = [choice[0] for choice in FloodThreat.THREAT_LEVEL_CHOICES]
+                if threat_level not in valid_levels:
+                    threat_level = 'MEDIUM'
+                
                 FloodThreat.objects.create(
                     name=properties.get('name', f'Flood Area {count + 1}'),
                     description=properties.get('description', ''),
-                    threat_level=properties.get('threat_level', 'MEDIUM'),
+                    threat_level=threat_level,
                     geometry=geometry
                 )
                 count += 1
@@ -136,18 +142,16 @@ class Command(BaseCommand):
                 
                 try:
                     vulnerability_index = float(properties.get('vulnerability_index', 0.5))
-                    # Ensure value is between 0 and 1
-                    vulnerability_index = max(0.0, min(1.0, vulnerability_index))
                 except (ValueError, TypeError):
                     vulnerability_index = 0.5
                 
                 try:
-                    affected_population = int(properties.get('affected_population', 0))
+                    affected_population = max(0, int(properties.get('affected_population', 0)))
                 except (ValueError, TypeError):
                     affected_population = 0
                 
                 try:
-                    linked_families = int(properties.get('linked_families', 0))
+                    linked_families = max(0, int(properties.get('linked_families', 0)))
                 except (ValueError, TypeError):
                     linked_families = 0
                 
@@ -200,7 +204,7 @@ class Command(BaseCommand):
 
     def _create_sample_data(self):
         """Create sample geospatial data for Soacha"""
-        from django.contrib.gis.geos import Polygon, MultiPolygon
+        from django.contrib.gis.geos import Polygon
         
         # Sample flood threat area (polygon around Soacha center)
         flood_polygon = Polygon((
