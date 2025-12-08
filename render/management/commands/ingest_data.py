@@ -142,6 +142,8 @@ class Command(BaseCommand):
                 
                 try:
                     vulnerability_index = float(properties.get('vulnerability_index', 0.5))
+                    # Ensure value is within valid range (0.0 to 1.0)
+                    vulnerability_index = max(0.0, min(1.0, vulnerability_index))
                 except (ValueError, TypeError):
                     vulnerability_index = 0.5
                 
@@ -188,7 +190,8 @@ class Command(BaseCommand):
         Convert geometry to MultiPolygon if needed.
         
         For non-polygon geometries (points, lines), creates a small buffer
-        of approximately 111 meters (0.001 degrees at the equator).
+        of 0.001 degrees. At Soacha's latitude (~4.5°), this equals approximately
+        110.8 meters in east-west direction and 111 meters in north-south direction.
         """
         if geometry.geom_type == 'Polygon':
             return MultiPolygon(geometry)
@@ -196,7 +199,6 @@ class Command(BaseCommand):
             return geometry
         else:
             # For points, lines, etc., create a small buffer
-            # 0.001 degrees ≈ 111 meters at the equator
             buffered = geometry.buffer(0.001)
             if buffered.geom_type == 'Polygon':
                 return MultiPolygon(buffered)
