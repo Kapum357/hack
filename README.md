@@ -1,9 +1,3 @@
-# Deploy a Django App on Render
-
-This is a sample [Django](https://www.djangoproject.com/) app created using Render's [Quick Start Guide](https://docs.render.com/deploy-django#new-django-app) and set up to work with PostgreSQL on Render.
-
-The sample app is deployed at https://django.onrender.com.
-
 ## Soacha Climate Resilience Application
 
 This application provides geospatial visualization for climate resilience data in Soacha, Colombia, including:
