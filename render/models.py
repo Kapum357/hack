@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class FloodThreat(models.Model):
@@ -32,7 +33,11 @@ class SocialVulnerability(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     vulnerability_index = models.FloatField(
-        help_text="Vulnerability index from 0 to 1"
+        help_text="Vulnerability index from 0 to 1",
+        validators=[
+            MinValueValidator(0.0),
+            MaxValueValidator(1.0)
+        ]
     )
     affected_population = models.IntegerField(
         default=0,

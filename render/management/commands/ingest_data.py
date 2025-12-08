@@ -134,12 +134,29 @@ class Command(BaseCommand):
                 )
                 properties = feature.get('properties', {})
                 
+                try:
+                    vulnerability_index = float(properties.get('vulnerability_index', 0.5))
+                    # Ensure value is between 0 and 1
+                    vulnerability_index = max(0.0, min(1.0, vulnerability_index))
+                except (ValueError, TypeError):
+                    vulnerability_index = 0.5
+                
+                try:
+                    affected_population = int(properties.get('affected_population', 0))
+                except (ValueError, TypeError):
+                    affected_population = 0
+                
+                try:
+                    linked_families = int(properties.get('linked_families', 0))
+                except (ValueError, TypeError):
+                    linked_families = 0
+                
                 SocialVulnerability.objects.create(
                     name=properties.get('name', f'Vulnerability Area {count + 1}'),
                     description=properties.get('description', ''),
-                    vulnerability_index=float(properties.get('vulnerability_index', 0.5)),
-                    affected_population=int(properties.get('affected_population', 0)),
-                    linked_families=int(properties.get('linked_families', 0)),
+                    vulnerability_index=vulnerability_index,
+                    affected_population=affected_population,
+                    linked_families=linked_families,
                     geometry=geometry
                 )
                 count += 1
@@ -163,13 +180,19 @@ class Command(BaseCommand):
         return count
 
     def _ensure_multipolygon(self, geometry):
-        """Convert geometry to MultiPolygon if needed"""
+        """
+        Convert geometry to MultiPolygon if needed.
+        
+        For non-polygon geometries (points, lines), creates a small buffer
+        of approximately 111 meters (0.001 degrees at the equator).
+        """
         if geometry.geom_type == 'Polygon':
             return MultiPolygon(geometry)
         elif geometry.geom_type == 'MultiPolygon':
             return geometry
         else:
             # For points, lines, etc., create a small buffer
+            # 0.001 degrees ≈ 111 meters at the equator
             buffered = geometry.buffer(0.001)
             if buffered.geom_type == 'Polygon':
                 return MultiPolygon(buffered)
