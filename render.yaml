@@ -48,7 +48,6 @@ services:
 
   - type: cron
     name: soacha-cron-ingest
-    plan: free
     runtime: python
     schedule: "0 0 * * *"
     buildCommand: "./build.sh"
