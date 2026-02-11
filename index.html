@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soacha Resilience Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ['Sora', 'sans-serif'],
+            },
+            colors: {
+              primary: "#F23545",
+              'background-light': "#f8f6f6",
+              'background-dark': "#221012",
+              'surface-light': "#ffffff",
+              'surface-dark': "#1a2632",
+              'alert-orange': "#F97316",
+              'status-success': "#22C55E",
+              'status-warning': "#F59E0B",
+              'status-danger': "#EF4444",
+              'risk-high': "#EF4444",
+              'risk-low': "#22C55E",
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem"
+            },
+            boxShadow: {
+              subtle: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+              card: "0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02)",
+              float: "0 10px 15px -3px rgba(13, 127, 242, 0.2), 0 4px 6px -2px rgba(13, 127, 242, 0.1)",
+              nav: "0 -4px 20px -5px rgba(0, 0, 0, 0.05)"
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Sora', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+      }
+      .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

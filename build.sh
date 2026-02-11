@@ -2,11 +2,13 @@
 # exit on error
 set -o errexit
 
-# change this line for whichever package you use, such as pip, or poetry, etc.
+# Install Python dependencies
 pip install -r requirements.txt
 
-# convert our static asset files on Render
-python manage.py collectstatic --no-input
+# Collect static files if needed (Flask doesn't have this by default, but if using Flask-Assets or similar)
+# python manage.py collectstatic --no-input  # Uncomment if you add static file collection
 
-# apply any database migrations that are outstanding
-python manage.py migrate
+# Apply any database migrations if using Flask-Migrate
+# flask db upgrade  # Uncomment if using Flask-Migrate
+
+echo "Build completed successfully"

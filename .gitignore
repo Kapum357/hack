@@ -1,2 +1,5 @@
 __pycache__
 venv
+PRD.md
+node_modules
+.env

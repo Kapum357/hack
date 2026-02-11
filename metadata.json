@@ -1,0 +1,9 @@
+{
+  "name": "Soacha Resilience Hub",
+  "description": "A comprehensive disaster response and management application for officials, community leaders, and volunteers in Soacha. It provides real-time monitoring, analytics, field reporting, and offline capabilities to enhance community resilience.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
